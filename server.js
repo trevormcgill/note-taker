@@ -1,19 +1,24 @@
+// Importing required modules
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
+// Initialize Express app and set the port
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Set up middleware for parsing request body and serving static files
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
+// Route for notes.html
 app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
+// API route for getting all notes
 app.get('/api/notes', (req, res) => {
   fs.readFile('./db/db.json', 'utf8', (err, data) => {
     if (err) {
@@ -24,6 +29,7 @@ app.get('/api/notes', (req, res) => {
   });
 });
 
+// API route for posting a new note
 app.post('/api/notes', (req, res) => {
   const newNote = req.body;
   newNote.id = uuidv4();
@@ -47,6 +53,7 @@ app.post('/api/notes', (req, res) => {
   });
 });
 
+// API route for deleting a note
 app.delete('/api/notes/:id', (req, res) => {
   const noteId = req.params.id;
 
@@ -69,10 +76,12 @@ app.delete('/api/notes/:id', (req, res) => {
   });
 });
 
+// Route for handling all other requests and serving index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
+// Starting the server
 app.listen(PORT, () => {
   console.log(`Server is listening on PORT ${PORT}`);
 });
